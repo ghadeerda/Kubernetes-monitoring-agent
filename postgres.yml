@@ -1,0 +1,78 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-metrics-listener
+  namespace: monitoring
+  # annotations:
+  #   service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  selector:
+    app: postgres-metrics
+  ports:
+  - protocol: TCP
+    port: 54322
+    targetPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-metrics-svc
+  namespace: monitoring
+  labels:
+    app: postgres-metrics
+spec:
+  ports:
+    - name: postgres-metrics-port
+      port: 5432
+      targetPort: 5432
+  selector:
+    app: postgres-metrics
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-metrics
+  namespace: monitoring
+  labels:
+    name: database
+    app: postgres-metrics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-metrics
+  template:
+    metadata:
+      labels:
+        app: postgres-metrics
+    spec:
+      containers:
+      - name: postgres-metrics
+        image: postgres:14-alpine
+        volumeMounts:
+        - name: postgres-volume-mount
+          mountPath: /var/lib/postgresql/data
+          # subPath: postgres
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-metrics-credentials
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-metrics-credentials
+              key: POSTGRES_PASSWORD
+      restartPolicy: Always
+      volumes:
+        - name: postgres-volume-mount
+          hostPath:
+            path: /var/lib/postgresql/data
+        - name: postgres-volume-mount
+          persistentVolumeClaim:
+           claimName: postgres-metrics
