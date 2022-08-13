@@ -1,11 +1,12 @@
 apiVersion: v1 
 kind: Service 
-metadata: 
+metadata:
   namespace: monitoring
   name: exporter
 spec: 
   selector: 
-      name: exporter
+      name: monitoring-agent
+      component: exporter
   ports: 
     - name: exporter 
       port: 80 
@@ -23,11 +24,13 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      name: exporter
+      name: monitoring-agent
+      component: exporter
   template:
     metadata:
       labels:
-        name: exporter
+        name: monitoring-agent
+        component: exporter
     spec:
       containers:
       - name: exporter

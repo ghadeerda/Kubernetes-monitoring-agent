@@ -4,8 +4,6 @@ kind: Service
 metadata:
   name: postgres-metrics-listener
   namespace: monitoring
-  # annotations:
-  #   service.beta.kubernetes.io/azure-load-balancer-internal: "true"
 spec:
   type: LoadBalancer
   selector:
