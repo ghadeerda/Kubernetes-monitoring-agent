@@ -69,8 +69,5 @@ spec:
       restartPolicy: Always
       volumes:
         - name: postgres-volume-mount
-          hostPath:
-            path: /var/lib/postgresql/data
-        - name: postgres-volume-mount
           persistentVolumeClaim:
            claimName: postgres-metrics
