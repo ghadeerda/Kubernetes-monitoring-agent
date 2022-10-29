@@ -1,4 +1,4 @@
-FROM prom/node-exporter as build 
+FROM prom/node-exporter:v1.4.0 as build 
 FROM alpine as runtime 
 
 COPY --from=build /bin/node_exporter /bin/node_exporter
