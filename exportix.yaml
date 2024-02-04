@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment #DaemonSet
+metadata:
+  labels:
+    name: exportix
+  name: exportix
+  namespace: metrics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: exportix
+  template:
+    metadata:
+      labels:
+        name: exportix
+    spec:
+      containers:
+      - name: exportix
+        image: ghadeerda/exportix:1.0
+        imagePullPolicy: Always
+        # resources:
+        #   limits:
+        #     cpu: 250m
+        #     memory: 180Mi
+        #   requests:
+        #     cpu: 102m
+        #     memory: 180Mi
+        # volumeMounts:
+        # - name: exportix-config-volume
+        #   mountPath: /appScraper.sh
+        #   subPath: appScraper.sh
+        env:
+          - name: DB_HOST
+            value: "postgres-metrics-svc"
+          - name: DB_USER
+            value: "metrics"
+          - name: DB_PASSWORD
+            value: "metricspass"
+          - name: DB_NAME
+            value: "metrics"
+          - name: MetricsType
+            value: "node" #app
+          - name: Target
+            value: "10.110.3.137"   #flaskload
+          - name: CustomMetrics
+            value: "no"         
+          - name: RECORDS_NUM
+            value: "15"
+          - name: INTERVAL
+            value: "2"
+      imagePullSecrets:
+      - name: ghreg
+      # volumes:
+      # - name: exportix-config-volume
+      #   configMap: 
+      #     defaultMode: 420
+      #     name: exporter-cm-app
