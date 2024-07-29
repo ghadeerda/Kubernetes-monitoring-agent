@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: metrics-collection-agent
-        image: <your_dockerhub_username>/metrics-collection-agent:latest
+        image: ghadeerda/metrics-collection-agent:latest
         ports:
         - containerPort: 5000
         volumeMounts:
