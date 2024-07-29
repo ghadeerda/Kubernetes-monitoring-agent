@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: metrics-collection-agent
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      name: metrics-collection-agent
+  template:
+    metadata:
+      labels:
+        name: metrics-collection-agent
+    spec:
+      containers:
+      - name: metrics-collection-agent
+        image: <your_dockerhub_username>/metrics-collection-agent:latest
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/agent-config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: metrics-agent-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metrics-agent-config
+  namespace: monitoring
+data:
+  config.json: |
+    {
+      "metrics_interval": 10,
+      "pushgateway_url": "http://pushgateway:9091"
+    }
